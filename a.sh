@@ -179,3 +179,76 @@ tar -xvzf plink_out.tar.gz plink_out/
 ##
 
 plink2 --bfile 5968696_24053_0_0.dragen.hard-filtered.vcf.filtered --update-name 5968696_24053_0_0.dragen.hard-filtered.vcf.filtered.bim 2 1 --make-bed --out out
+
+
+##
+
+# on g03
+pyenv activate dx
+dx login
+
+dx run --instance-type mem1_ssd1_v2_x2 app-cloud_workstation
+
+# 5816418_24053_0_0.dragen.hard-filtered.vcf.filtered.vcf
+# tabix example.vcf.gz 1:1000-2000
+
+dx ssh job-GpVyVp0JzVpv2px8b359fB0y
+
+unset DX_WORKSPACE_ID
+dx cd $DX_PROJECT_CONTEXT_ID:
+dx select --level=VIEW
+
+# project-Gjz9YXjJzVpj2P4v2vFpg4GP:/Bulk/DRAGEN WGS/Whole genome variant call files (VCFs) (DRAGEN) [500k release]/58/5816418_24053_0_0.dragen.hard-filtered.vcf.gz
+
+dx download "project-Gjz9YXjJzVpj2P4v2vFpg4GP:/Bulk/DRAGEN WGS/Whole genome variant call files (VCFs) (DRAGEN) [500k release]/58/5816418_24053_0_0.dragen.hard-filtered.vcf.gz"
+dx download "project-Gjz9YXjJzVpj2P4v2vFpg4GP:/Bulk/DRAGEN WGS/Whole genome variant call files (VCFs) (DRAGEN) [500k release]/58/5816418_24053_0_0.dragen.hard-filtered.vcf.gz.tbi"
+
+
+sudo apt install tabix
+
+# tabix example.vcf.gz 1:1-200000 # 200K SNPs
+# tabix "5816418_24053_0_0.dragen.hard-filtered.vcf.gz" 1:1-200000
+tabix "5816418_24053_0_0.dragen.hard-filtered.vcf.gz" 1:1-200000 -h > out.vcf
+
+mv out.vcf 5816418_filtered.vcf
+
+dx upload 5816418_filtered.vcf
+
+# on g01
+dx download 5816418_filtered.vcf
+
+
+##
+
+# on g01
+pyenv activate dx
+
+dx run --instance-type mem1_ssd1_v2_x2 app-cloud_workstation
+
+# 5816418_24053_0_0.dragen.hard-filtered.vcf.filtered.vcf
+# tabix example.vcf.gz 1:1000-2000
+
+dx ssh job-GpX2KkjJzVpgFKPZzjX45Z3j
+
+unset DX_WORKSPACE_ID
+dx cd $DX_PROJECT_CONTEXT_ID:
+dx select --level=VIEW
+
+# project-Gjz9YXjJzVpj2P4v2vFpg4GP:/Bulk/DRAGEN WGS/Whole genome variant call files (VCFs) (DRAGEN) [500k release]/58/5816418_24053_0_0.dragen.hard-filtered.vcf.gz
+
+dx download "project-Gjz9YXjJzVpj2P4v2vFpg4GP:/Bulk/DRAGEN WGS/Whole genome variant call files (VCFs) (DRAGEN) [500k release]/58/5816418_24053_0_0.dragen.hard-filtered.vcf.gz"
+dx download "project-Gjz9YXjJzVpj2P4v2vFpg4GP:/Bulk/DRAGEN WGS/Whole genome variant call files (VCFs) (DRAGEN) [500k release]/58/5816418_24053_0_0.dragen.hard-filtered.vcf.gz.tbi"
+
+
+sudo apt install tabix
+
+# tabix example.vcf.gz 1:1-200000 # 200K SNPs
+# tabix "5816418_24053_0_0.dragen.hard-filtered.vcf.gz" 1:1-200000
+tabix -h 5816418_24053_0_0.dragen.hard-filtered.vcf.gz 1:100-200 > 5816418_1.vcf
+
+dx upload 5816418_1.vcf
+
+# on g01
+dx download 5816418_1.vcf
+
+mv 5816418_1.vcf /var/genetics/ws/mahdimir/local/prj_data/40724_read_gt_from_VCF/inp/
